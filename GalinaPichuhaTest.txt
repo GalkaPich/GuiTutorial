@@ -1,0 +1,48 @@
+require 'open-uri'
+require 'nokogiri'
+require 'uri'
+require 'csv'
+
+begin
+puts 'Ссылка на страницу категории:'
+url=gets.chomp
+puts 'Имя файла в который будет записан результат:'
+filename=gets.chomp
+end while (url !~ URI::regexp)||(filename.empty?)
+
+# качаем страницу 
+html=open(url)
+# читаем
+doc=Nokogiri::HTML(html)
+
+#достаём картинку
+goodImage=doc.xpath('//img[@id="bigpic"]/@src').map(&:value)
+
+#достаём название
+goodName=doc.xpath('//img[@id="bigpic"]/@ title').map(&:value)
+
+
+# создаём массив для хранения цены и веса товаров, собираем необходимую информацию
+goods=[]
+doc.xpath('//*[@class = "attribute_list"]/*' ).each do |element|
+
+goodWeight=element.search('span.attribute_name').text.strip
+goodPrice=element.search('span.attribute_price').text.strip
+  
+  unless goodWeight==""||goodPrice==""
+  goods.push(
+    name: goodName.to_s + "-" + goodWeight.to_s,
+    price: goodPrice,
+    picture: goodImage)
+  end
+    
+end
+
+puts goods
+
+#записываем в csv-файл
+  unless goods.nil? || goods == 0
+   CSV.open(filename,"w") do |wr|
+   wr << goods
+     end
+  end
