@@ -56,33 +56,42 @@ doc2=Nokogiri::HTML(html2)
  
   #достаём картинку
   goodImage=(doc2.xpath('//img[@id="bigpic"]/@src').map(&:value))
+puts goodImage
   
   #достаём название
   goodName=doc2.xpath('//img[@id="bigpic"]/@ title').map(&:value)
-  
+  puts goodName
   #достаём высовку и цену
   doc2.xpath('//*[@class = "attribute_list"]/*' ).each do |element|
   
   goodWeight=element.search('span.attribute_name').text.strip
-
+puts goodWeight
   goodPrice=element.search('span.attribute_price').text.strip
-
+puts goodPrice
   fullName=goodName.to_s+"-"+goodWeight.to_s
+ puts fullName
+  
     unless goodWeight==""||goodPrice==""
-    goods.push(
-      name: fullName,
-      price: goodPrice,
-      image: goodImage)
+      
+      goods.push({
+        name: fullName,
+        price: goodPrice,
+        image: goodImage
+      })
       end
   end
 }   
     end 
-
+    
 #записываем в csv-файл
-       unless goods.nil? || goods.length == 0
-       CSV.open(filename,"w") do |wr|
-          goods.each{|i| 
-           wr<<[i]
-         }
-        end
-            end
+
+ 
+CSV.open(filename, 'w', write_headers: true, headers: goods.first.keys) do |csv|
+  goods.each do |man|
+    csv << man.values
+  end
+end
+
+
+
+
