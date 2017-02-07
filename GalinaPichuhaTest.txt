@@ -1,7 +1,8 @@
-require 'open-uri'
+﻿require 'open-uri'
 require 'nokogiri'
 require 'uri'
 require 'csv'
+
 
 begin
 puts 'Ссылка на страницу категории:'
@@ -38,7 +39,7 @@ goodPrice=element.search('span.attribute_price').text.strip
     
 end
 
-puts goods
+#puts goods
 
 #записываем в csv-файл
   unless goods.nil? || goods == 0
